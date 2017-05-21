@@ -20,8 +20,10 @@ import java.util.logging.Logger;
  */
 
 public class Server {
-    public static int wyswietlanyWykres = 0;
+    private static int wyswietlanyWykres = 0;
+    private static JDB jdb;
     public static void main(String[] args) {
+        jdb =  new JDB();
         runSerwer();
     }
 
@@ -52,8 +54,9 @@ public class Server {
                         "          ['3',  21],\n" +
                         "          ['4',  22]";
                 response = new StringBuilder(response).insert(index, daneZBazy).toString();
+                index = response.indexOf("<!-- TuWklejSensory -->");
+                response = new StringBuilder(response).insert(index, jdb.listTablesHTTP()).toString();
                 index = response.indexOf("<!-- TuWklejNazweWykresu -->");
-
                 response = new StringBuilder(response).insert(index, nazwaWykresu).toString();
             }
 

@@ -18,7 +18,7 @@ public class JDBrun {
 //        jdb.delateTable("SENSORKUCHNIA");
 //        jdb.delateTable("SENSORLAZIEKA");
 
-        jdb.listTablesHTTP();
+        System.out.println(jdb.listTablesHTTP());
         jdb.closeStatements();
         jdb.closeDatabase();
     }

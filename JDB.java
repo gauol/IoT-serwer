@@ -172,20 +172,24 @@ public class JDB {
 
     }
 
-    public void listTablesHTTP() {
+    public String listTablesHTTP() {
         try{
             DatabaseMetaData dbmd = conn.getMetaData();
             ResultSet resultSet = dbmd.getTables(
                     "derbyDB", schemaName, "%", null);
+            StringBuilder rsp = new StringBuilder();
             while (resultSet.next()) {
                 String strTableName = resultSet.getString("TABLE_NAME");
                 String element = "<a class=\"w3-bar-item w3-button\" href=\"?id=5\">"+strTableName+"</a>\r\n";
-                System.out.println(element);
+                //System.out.println(element);
+                rsp.append(element);
             }
-            Server.printRln("separator");
+            //Server.printRln("separator");
+            return rsp.toString();
         }catch (SQLException sqlex){
             printSQLException(sqlex);
         }
+        return "<a class=\"w3-bar-item w3-button\" href=\"?id=5\">"+"Brak sensorów"+"</a>\r\n";
     }
 
     public void addData(String tableName){

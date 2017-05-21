@@ -1,8 +1,13 @@
+import java.text.DecimalFormat;
+import java.util.Random;
+
 /**
  * Created by Gau on 27.04.2017.
  */
 
 public class JDBrun {
+    private static Random random = new Random();
+    private static DecimalFormat df = new DecimalFormat("#,#");
     public static void main(String[] args) throws InterruptedException {
         JDB jdb =  new JDB();
         //jdb.addData();
@@ -20,22 +25,29 @@ public class JDBrun {
 //        jdb.delateTable("SYPIALNIA");
         //System.out.println(jdb.listTablesHTTP());
 
-        jdb.deleteData("KUCHNIA");
-        jdb.addData("KUCHNIA", (float) 13.2);
+//        jdb.createTable("Lazienka");
+        String tableNejm = "JADALNIA";
+//        jdb.deleteData(tableNejm);
+        jdb.addData(tableNejm, nextFloat(-13,45));
         Thread.sleep(10000);
-        jdb.addData("KUCHNIA", (float) 23.3);
+        jdb.addData(tableNejm, nextFloat(-13,45));
         Thread.sleep(10000);
-        jdb.addData("KUCHNIA", (float) 21.1);
+        jdb.addData(tableNejm, nextFloat(-13,45));
         Thread.sleep(10000);
-        jdb.addData("KUCHNIA", (float) 2.0);
+        jdb.addData(tableNejm, nextFloat(-13,45));
         Thread.sleep(10000);
-        jdb.addData("KUCHNIA", (float) 12.9);
-        Thread.sleep(10000);
+        jdb.addData(tableNejm, nextFloat(-13,45));
+       //Thread.sleep(10000);
 
-        jdb.getData("KUCHNIA");
+        jdb.getData(tableNejm);
 
         //jdb.listTables();
         jdb.closeStatements();
         jdb.closeDatabase();
+    }
+
+    private static float nextFloat(float min, float max)
+    {
+        return (min + random.nextFloat() * (max - min));
     }
 }

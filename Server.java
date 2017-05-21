@@ -21,13 +21,18 @@ import java.util.logging.Logger;
  */
 
 public class Server {
-    private static int wyswietlanyWykres = 0;
+    private static int printetChart = 0;
     private static JDB jdb;
     private static ArrayList<String> tabele;
 
     public static void main(String[] args) {
-        jdb =  new JDB();
-        runSerwer();
+        try {
+            jdb = new JDB();
+            runSerwer();
+        }catch (Exception sql){
+            System.out.println("FATAL ERROR");
+            System.out.println(sql.toString());
+        }
     }
 
     public static ByteBuffer getHtmlBuffer(String path, SocketChannel dos) throws IOException {
@@ -35,8 +40,8 @@ public class Server {
         if (path.equals("/"))
             path = "/index.html";
         if(path.charAt(1)=='?') {
-            wyswietlanyWykres = Integer.parseInt(path.replaceAll("[\\D]", ""));
-            System.out.println("Wykres do wyswietlenia: "+ wyswietlanyWykres);
+            printetChart = Integer.parseInt(path.replaceAll("[\\D]", ""));
+            System.out.println("Wykres do wyswietlenia: "+ printetChart);
             path = "/index.html";
         }
         try{
@@ -46,18 +51,19 @@ public class Server {
 
             if(path.equals("/index.html")){ //wklejam dane z bazy
                 String nazwaWykresu;
-
-                if(wyswietlanyWykres == 0){
+                int index;
+                if(printetChart == 0){
                     nazwaWykresu = "Wybierz wykres z menu";
-                }else{
-                    nazwaWykresu = "Wykres :"+wyswietlanyWykres;
+                }else {
+                    nazwaWykresu = "Wykres :" + printetChart;
+
+                    index = response.indexOf("<!-- TuWklejPomiary -->"); //     ",\r\n['" + data + ", " + temp + "]"
+                    try {
+                        String daneZBazy = jdb.getDataHTML(tabele.get(printetChart - 1));
+                        response = new StringBuilder(response).insert(index, daneZBazy).toString();
+                    }catch (IndexOutOfBoundsException ignored){}
+
                 }
-                int index = response.indexOf("//MiejsceDoWklejeniaDanychZBazy");
-                String daneZBazy = "['1',  28],\n" +
-                        "          ['2',  32],\n" +
-                        "          ['3',  21],\n" +
-                        "          ['4',  22]";
-                response = new StringBuilder(response).insert(index, daneZBazy).toString();
                 index = response.indexOf("<!-- TuWklejSensory -->");
                 response = new StringBuilder(response).insert(index, getTablesListHTTP()).toString();
                 index = response.indexOf("<!-- TuWklejNazweWykresu -->");

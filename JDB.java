@@ -201,12 +201,14 @@ public class JDB {
         }
     }
 
-    public void getDataHTML(String tableName) {
+    public String getDataHTML(String tableName) {
+        StringBuilder str = new StringBuilder();
         try {
             ResultSet rs = s.executeQuery(
                     "SELECT * FROM "+ schemaName + "." + tableName + " ORDER BY rok, miesiac, dzien, Czas");            //(temp float, Czas time, dzien int, miesiac int, rok int)
             while (rs.next()) {
-                System.out.println(rs.getFloat(1) + " " + rs.getString(2));
+                String eventDate = rs.getTime(2).toString() + " " + rs.getInt(3) + "-" + rs.getInt(4) + "-" + rs.getInt(5);
+                str.append( ",\r\n['" + eventDate + "', " + rs.getFloat(1) + "]");
             }
 
             if (rs != null) {
@@ -214,9 +216,12 @@ public class JDB {
                 rs = null;
             }
 
+            return str.toString();
+
         } catch (SQLException sqle) {
             printSQLException(sqle);
         }
+        return "FATAL ERROR";
     }
 
     public void deleteData(String tableName) {

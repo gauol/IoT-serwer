@@ -3,22 +3,38 @@
  */
 
 public class JDBrun {
-    public static void main(String[] args) {
+    public static void main(String[] args) throws InterruptedException {
         JDB jdb =  new JDB();
         //jdb.addData();
         //jdb.getData();
         //jdb.createSchema(jdb.schemaName);
 
-//        jdb.createTable("sensor_Kuchnia");
-//        jdb.createTable("sensor_Jadalnia");
-//        jdb.createTable("sensor_Lazieka");
-//        jdb.createTable("sensor_Sypialnia");
+//        jdb.createTable("Kuchnia");
+//        jdb.createTable("Jadalnia");
+//        jdb.createTable("Lazieka");
+//        jdb.createTable("Sypialnia");
 
-//        jdb.delateTable("SENSORJADALNIA");
-//        jdb.delateTable("SENSORKUCHNIA");
-//        jdb.delateTable("SENSORLAZIEKA");
-
+//        jdb.delateTable("JADALNIA");
+//        jdb.delateTable("KUCHNIA");
+//        jdb.delateTable("LAZIEKA");
+//        jdb.delateTable("SYPIALNIA");
         //System.out.println(jdb.listTablesHTTP());
+
+        jdb.deleteData("KUCHNIA");
+        jdb.addData("KUCHNIA", (float) 13.2);
+        Thread.sleep(10000);
+        jdb.addData("KUCHNIA", (float) 23.3);
+        Thread.sleep(10000);
+        jdb.addData("KUCHNIA", (float) 21.1);
+        Thread.sleep(10000);
+        jdb.addData("KUCHNIA", (float) 2.0);
+        Thread.sleep(10000);
+        jdb.addData("KUCHNIA", (float) 12.9);
+        Thread.sleep(10000);
+
+        jdb.getData("KUCHNIA");
+
+        //jdb.listTables();
         jdb.closeStatements();
         jdb.closeDatabase();
     }

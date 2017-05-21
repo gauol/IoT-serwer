@@ -6,29 +6,36 @@ import java.util.Calendar;
  * Created by Gaua on 2016-09-13.
  */
 
-public class czas{
+public class Czas {
 
     private int h;
     private int m;
     private int s;
     private int ms;
+    private int mon;
+    private int day;
+    private int year;
 
-    public czas(){
+    public Czas(){
         Calendar cal = Calendar.getInstance();
         h = cal.get(Calendar.HOUR_OF_DAY);
         m = cal.get(Calendar.MINUTE);
         s = cal.get(Calendar.SECOND);
         ms = cal.get(Calendar.MILLISECOND);
+        mon = cal.get(Calendar.MONTH);
+        day = cal.get(Calendar.DAY_OF_MONTH);
+        year = cal.get(Calendar.YEAR);
+
     }
 
-    public czas(int hour,int minutes,int seconds,int miliseconds){
+    public Czas(int hour, int minutes, int seconds, int miliseconds){
         h = hour;
         m = minutes;
         s = seconds;
         ms = miliseconds;
     }
 
-    public static String liczRoznice(czas pierwszy, czas drugi) throws ParseException {
+    public static String liczRoznice(Czas pierwszy, Czas drugi) throws ParseException {
         String roznica;
        // java.text.DateFormat df = new java.text.SimpleDateFormat("hh:mm:ss");
         java.text.DateFormat df = DateFormat.getTimeInstance();
@@ -59,9 +66,14 @@ public class czas{
         return ms;
     }
 
-    public String getFileTime(){
-        int sum = h*3600+m*60+s;
-        return sum+"."+ms+";";
+    public int getMonth(){return mon;}
+
+    public int getDzien(){return day;}
+
+    public int getYear(){return  year;}
+
+    public int getMsTime(){
+        return h*3600000+m*60000+s*1000+ms;
     }
      public String getTime(){
          String temp1;

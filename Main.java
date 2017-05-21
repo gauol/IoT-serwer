@@ -43,10 +43,10 @@ public class Main extends JFrame implements ActionListener{
     public void actionPerformed(ActionEvent e){
         String name = e.getActionCommand();
         if(name.equals("Start")){
-            LogTextField.setText(new czas().getTime() + "\t Wcisnieto start\n\r"+LogTextField.getText());
+            LogTextField.setText(new Czas().getTime() + "\t Wcisnieto start\n\r"+LogTextField.getText());
             LogTextField.setCaretPosition(LogTextField.getDocument().getLength());
         }else if(name.equals("Stop")){
-            LogTextField.setText(new czas().getTime() + "\t Wcisnieto stop\n\r"+LogTextField.getText());
+            LogTextField.setText(new Czas().getTime() + "\t Wcisnieto stop\n\r"+LogTextField.getText());
             LogTextField.setCaretPosition(LogTextField.getDocument().getLength());
         }
 

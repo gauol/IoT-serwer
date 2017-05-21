@@ -9,6 +9,7 @@ import java.nio.charset.CharsetEncoder;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.logging.Level;
@@ -22,12 +23,15 @@ import java.util.logging.Logger;
 public class Server {
     private static int wyswietlanyWykres = 0;
     private static JDB jdb;
+    private static ArrayList<String> tabele;
+
     public static void main(String[] args) {
         jdb =  new JDB();
         runSerwer();
     }
 
     public static ByteBuffer getHtmlBuffer(String path, SocketChannel dos) throws IOException {
+        tabele = jdb.listTablesToArray();
         if (path.equals("/"))
             path = "/index.html";
         if(path.charAt(1)=='?') {
@@ -55,7 +59,7 @@ public class Server {
                         "          ['4',  22]";
                 response = new StringBuilder(response).insert(index, daneZBazy).toString();
                 index = response.indexOf("<!-- TuWklejSensory -->");
-                response = new StringBuilder(response).insert(index, jdb.listTablesHTTP()).toString();
+                response = new StringBuilder(response).insert(index, getTablesListHTTP()).toString();
                 index = response.indexOf("<!-- TuWklejNazweWykresu -->");
                 response = new StringBuilder(response).insert(index, nazwaWykresu).toString();
             }
@@ -165,5 +169,12 @@ public class Server {
         String astrTrim = strTrim.substring(0, strTrim.indexOf(" "));
         System.out.println(astrTrim);
         return astrTrim;
+    }
+    private static String getTablesListHTTP(){
+        StringBuilder listaTabelHTML = new StringBuilder();
+        int ctr = 1;
+        for(String str : tabele )
+            listaTabelHTML.append("<a class=\"w3-bar-item w3-button\" href=\"?id=").append(ctr++).append("\">").append(str).append("</a>\r\n");
+        return listaTabelHTML.toString();
     }
 }

@@ -172,24 +172,23 @@ public class JDB {
 
     }
 
-    public String listTablesHTTP() {
+    public ArrayList<String> listTablesToArray() {
+        ArrayList<String> rsp = new ArrayList<>();
         try{
             DatabaseMetaData dbmd = conn.getMetaData();
             ResultSet resultSet = dbmd.getTables(
                     "derbyDB", schemaName, "%", null);
-            StringBuilder rsp = new StringBuilder();
+
             while (resultSet.next()) {
-                String strTableName = resultSet.getString("TABLE_NAME");
-                String element = "<a class=\"w3-bar-item w3-button\" href=\"?id=5\">"+strTableName+"</a>\r\n";
-                //System.out.println(element);
-                rsp.append(element);
+                rsp.add(resultSet.getString("TABLE_NAME"));
             }
-            //Server.printRln("separator");
-            return rsp.toString();
+            return rsp;
         }catch (SQLException sqlex){
             printSQLException(sqlex);
+            rsp.add("Brak sensorów!");
+            return rsp;
         }
-        return "<a class=\"w3-bar-item w3-button\" href=\"?id=5\">"+"Brak sensorów"+"</a>\r\n";
+
     }
 
     public void addData(String tableName){
@@ -216,8 +215,7 @@ public class JDB {
 //    public Class czujnik {
 //
 //        ArrayList<pomiar> pomiary = new ArrayList<pomiar>;
-//
-//
+
 //    }
 //
 //    private Class pomiar{

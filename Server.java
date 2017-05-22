@@ -14,6 +14,8 @@ import java.util.Iterator;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 
 /**
@@ -132,8 +134,7 @@ public class Server {
                             SocketAddress clientAddress = udpserver.receive(receiveBuffer);
                             receiveBuffer.position(0);
                             printRln("Separator");
-                            System.out.println("Dane: "+new String( receiveBuffer.array(),"UTF-8")
-                                    +" From: "+ clientAddress.toString());
+                            interpreterUDP(clientAddress.toString(), new String( receiveBuffer.array(),"UTF-8"));
                         }else if (key.isReadable()) {
                             printRln("Separator");
                             SocketChannel client = (SocketChannel) key.channel();
@@ -146,8 +147,6 @@ public class Server {
                                 Server.getHtmlBuffer(httpqr, client);
                             }
                             client.close();
-                            //printRln("Separator");
-                            //System.out.println("Message read from client: " + output);
                         }
                         i.remove();
                     }
@@ -182,5 +181,17 @@ public class Server {
         for(String str : tabele )
             listaTabelHTML.append("<a class=\"w3-bar-item w3-button\" href=\"?id=").append(ctr++).append("\">").append(str).append("</a>\r\n");
         return listaTabelHTML.toString();
+    }
+
+    private static void interpreterUDP(String from, String data){
+        String inte = data;
+        Pattern p = Pattern.compile("(SEN=)(\\D+):(TEMP1=)(\\d+.\\d+):(TEMP2=)(\\d+.\\d+)");
+        Matcher m = p.matcher(inte);
+        if(m.find()) {
+            String id = m.group(2);
+            String temp1 = m.group(4);
+            String temp2 = m.group(6);
+            System.out.println("Odebrano Dane : SEN = " + id + " : " + Float.parseFloat(temp1) + " : " + Float.parseFloat(temp2)+" od: " + from );
+        }
     }
 }

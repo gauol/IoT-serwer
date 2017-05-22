@@ -10,9 +10,10 @@ import java.io.*;
 public class Main extends JFrame implements ActionListener{
 
     private JTextArea LogTextField;
+    private static Server srv;
 
     public static void main(String args[]) throws IOException {
-        System.out.println("To jest pierwsza linia programu \r\n to jest druga linia");
+        Server.print("To jest pierwsza linia programu \r\n to jest druga linia");
         new Main().setVisible(true);
     }
 
@@ -37,6 +38,8 @@ public class Main extends JFrame implements ActionListener{
         add(StartButton);
         add(StopButton);
         add(LogTextField);
+
+        srv = new Server(90);
     }
 
     @Override

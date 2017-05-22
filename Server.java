@@ -1,3 +1,4 @@
+import javax.swing.*;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
@@ -7,6 +8,7 @@ import java.nio.channels.*;
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetEncoder;
 import java.nio.file.Files;
+import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -26,25 +28,42 @@ public class Server {
     private static int printetChart = 0;
     private static JDB jdb;
     private static ArrayList<String> tabele;
+    private static int port = 90;
+    private static JTextArea LogTextField;
 
     public static void main(String[] args) {
+        go();
+    }
+
+     Server(int port){
+        Server.port = port;
+     }
+     Server(int port, JTextArea jta){
+        Server.port = port;
+        LogTextField = jta;
+    }
+
+    private static void go(){
         try {
             jdb = new JDB();
             runSerwer();
         }catch (Exception sql){
-            System.out.println("FATAL ERROR");
-            System.out.println(sql.toString());
+            Server.print("FATAL ERROR");
+            Server.print(sql.toString());
         }
     }
 
-    public static ByteBuffer getHtmlBuffer(String path, SocketChannel dos) throws IOException {
+    public static void getHtmlBuffer(String path, SocketChannel dos) throws IOException {
         tabele = jdb.listTablesToArray();
+        print(path);
         if (path.equals("/"))
             path = "/index.html";
         if(path.charAt(1)=='?') {
             printetChart = Integer.parseInt(path.replaceAll("[\\D]", ""));
-            System.out.println("Wykres do wyswietlenia: "+ printetChart);
             path = "/index.html";
+        }
+        if (path.equals("/favicon.ico")){
+
         }
         try{
             Path pathF = Paths.get(System.getProperty("user.dir")+"/src/web" + path);
@@ -58,7 +77,6 @@ public class Server {
                     nazwaWykresu = "Wybierz wykres z menu";
                 }else {
                     nazwaWykresu = "Wykres :" + printetChart;
-
                     index = response.indexOf("<!-- TuWklejPomiary -->"); //     ",\r\n['" + data + ", " + temp + "]"
                     try {
                         String daneZBazy = jdb.getDataHTML(tabele.get(printetChart - 1));
@@ -71,11 +89,7 @@ public class Server {
                 index = response.indexOf("<!-- TuWklejNazweWykresu -->");
                 response = new StringBuilder(response).insert(index, nazwaWykresu).toString();
             }
-
-            //dos.write("hello");
             CharsetEncoder encoder = Charset.forName("UTF-8").newEncoder();
-            //ByteBuffer out = encoder.encode(CharBuffer.wrap(str));
-            //
             dos.write(encoder.encode(CharBuffer.wrap("HTTP/1.1 200 OK\r\nContent-length="+response.length())));
             if(path.equals("/index.html"))
                 dos.write(encoder.encode(CharBuffer.wrap("\r\nContent-type:text/html; charset=UTF-8\r\n\r\n")));
@@ -83,22 +97,21 @@ public class Server {
                 dos.write(encoder.encode(CharBuffer.wrap("\r\n\r\n")));
 
             dos.write(encoder.encode(CharBuffer.wrap(response)));
-
-            return null;
         }
-        catch (IOException error){
-            System.out.println(error);
-            String str = "HTTP/1.1 200 OK\n" +
-                    "\n <h1>404</h1>";
+        catch (InvalidPathException | IOException error){
+            print(error.toString());
+            String str = "HTTP/1.1 200 OK\r\n" +
+                    "\r\n <h1>404</h1>";
             CharsetEncoder encoder = Charset.forName("UTF-8").newEncoder();
-            return encoder.encode(CharBuffer.wrap(str));
+            dos.write(encoder.encode(CharBuffer.wrap(str)));
+        }finally {
+            dos.close();
+            print("zamykam");
         }
     }
 
     private static void runSerwer() {
         try {
-            int port = 90;
-
             SocketAddress localport = new InetSocketAddress(port);
             ServerSocketChannel tcpserver = ServerSocketChannel.open();
             tcpserver.socket().bind(new InetSocketAddress("localhost", port));
@@ -116,7 +129,7 @@ public class Server {
             udpserver.register(selector, SelectionKey.OP_READ);
 
             ByteBuffer receiveBuffer = ByteBuffer.allocate(1024);
-            System.out.println("http://localhost:" + port);
+            print("http://localhost:" + port);
             for (; ; )
                 try {
                     selector.select();
@@ -133,10 +146,8 @@ public class Server {
                         else if (key.isReadable() && c == udpserver) {
                             SocketAddress clientAddress = udpserver.receive(receiveBuffer);
                             receiveBuffer.position(0);
-                            //printRln("Separator");
                             interpreterUDP(clientAddress.toString(), new String( receiveBuffer.array(),"UTF-8"));
                         }else if (key.isReadable()) {
-                            printRln("Separator");
                             SocketChannel client = (SocketChannel) key.channel();
                             client.read(bufferTCP);
                             String output = new String(bufferTCP.array()).trim();
@@ -146,16 +157,14 @@ public class Server {
                                //uniknac dodawania stringa plusem//
                                 Server.getHtmlBuffer(httpqr, client);
                             }
-                            client.close();
                         }
                         i.remove();
                     }
                 } catch (java.io.IOException e) {
-                    Logger l = Logger.getLogger(DaytimeServer.class.getName());
-                    l.log(Level.WARNING, "IOException in Server", e);
+
+                    print("IOException in Server "+ e);
                 } catch (Throwable t) {
-                    Logger l = Logger.getLogger(DaytimeServer.class.getName());
-                    l.log(Level.SEVERE, "FATAL error in Server", t);
+                    print("FATAL error in Server "+ t);
                     System.exit(1);
                 }
         } catch (Exception e) {
@@ -166,13 +175,13 @@ public class Server {
     static void printRln(String msg){
         String ANSI_RED = "\u001B[31m";
         String ANSI_RESET = "\u001B[0m";
-        System.out.println(ANSI_RED + msg + ANSI_RESET);
+        Server.print(ANSI_RED + msg + ANSI_RESET);
     }
 
     private static String getHTTPquery(String daneIN){
         String strTrim = daneIN.substring(daneIN.indexOf("GET")+4, daneIN.length());
         String astrTrim = strTrim.substring(0, strTrim.indexOf(" "));
-        System.out.println(astrTrim);
+        //print(astrTrim);
         return astrTrim;
     }
     private static String getTablesListHTTP(){
@@ -190,10 +199,18 @@ public class Server {
             String id = m.group(2);
             String temp1 = m.group(4);
             String temp2 = m.group(6);
-            System.out.println("Odebrano Dane : SEN = "+id+" : " + temp1 +" : "+ temp2);
+            print("Odebrano Dane : SEN = "+id+" : " + temp1 +" : "+ temp2);
             jdb.addData(id, Float.parseFloat(temp1),Float.parseFloat(temp2));
         }
         else
             printRln("Error Interpretacji" + data);
     }
+
+    public static void print(String str){
+        System.out.println(str);
+        if(LogTextField!=null)
+            LogTextField.setText(new Czas().getTime() + str +LogTextField.getText());
+        //LogTextField.setCaretPosition(LogTextField.getDocument().getLength());
+    }
+
 }

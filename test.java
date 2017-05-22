@@ -15,7 +15,7 @@ public class test {
             String id = m.group(2);
             String temp1 = m.group(4);
             String temp2 = m.group(6);
-            System.out.println("Odebrano Dane : SEN = "+id+" : " + temp1 +" : "+ temp2);
+            Server.print("Odebrano Dane : SEN = "+id+" : " + temp1 +" : "+ temp2);
         }
     }
 }

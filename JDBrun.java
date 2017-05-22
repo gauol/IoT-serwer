@@ -24,7 +24,7 @@ public class JDBrun {
 //        jdb.delateTable("KUCHNIA");
 //        jdb.delateTable("LAZIENKA");
 //        jdb.delateTable("SYPIALNIA");
-        //System.out.println(jdb.listTablesHTTP());
+        //Server.print(jdb.listTablesHTTP());
 
 //        jdb.createTable("Lazienka");
         String tableNejm = "Sypialnia";

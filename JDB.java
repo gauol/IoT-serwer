@@ -20,7 +20,7 @@ public class JDB {
     }
 
     void go() {
-        System.out.println("Uruchamiam derby " + framework + " mode");
+        Server.print("Uruchamiam derby " + framework + " mode");
         conn = null;
         statements = new ArrayList<>(); // list of Statements, PreparedStatements
 
@@ -28,7 +28,7 @@ public class JDB {
             String dbName = "derbyDB"; // the name of the database
             conn = DriverManager.getConnection(protocol + dbName
                     + ";create=false", getProperties());
-            System.out.println("Connected to database " + dbName);
+            Server.print("Connected to database " + dbName);
 
             conn.setAutoCommit(false);
 
@@ -42,10 +42,10 @@ public class JDB {
 
     public static void printSQLException(SQLException e) {
         while (e != null) {
-            System.err.println("\n----- SQLException -----");
-            System.err.println("  SQL State:  " + e.getSQLState());
-            System.err.println("  Error Code: " + e.getErrorCode());
-            System.err.println("  Message:    " + e.getMessage());
+            Server.print("\n----- SQLException -----");
+            Server.print("  SQL State:  " + e.getSQLState());
+            Server.print("  Error Code: " + e.getErrorCode());
+            Server.print("  Message:    " + e.getMessage());
 
             e = e.getNextException();
         }
@@ -55,7 +55,7 @@ public class JDB {
         try {
             // We create a table...
             s.execute("create schema : " + schemaName);
-            System.out.println("Created schema : " + schemaName);
+            Server.print("Created schema : " + schemaName);
         } catch (SQLException sqlex) {
             printSQLException(sqlex);
         }
@@ -64,7 +64,7 @@ public class JDB {
     public void createTable(String tableName) {
         try {
             s.execute("create table " + schemaName + "." + tableName + " (temp1 float, temp2 float, Czas time, dzien int, miesiac int, rok int)");
-            System.out.println("Created table: " + tableName);
+            Server.print("Created table: " + tableName);
         } catch (SQLException sqlex) {
             printSQLException(sqlex);
         }
@@ -74,7 +74,7 @@ public class JDB {
         try {
             // We create a table...
             s.execute("drop table " + schemaName + "." + tableName);
-            System.out.println("Dropped table: " + tableName);
+            Server.print("Dropped table: " + tableName);
         } catch (SQLException sqlex) {
             printSQLException(sqlex);
         }
@@ -86,7 +86,7 @@ public class JDB {
         } catch (SQLException se) {
             if (((se.getErrorCode() == 50000)
                     && ("XJ015".equals(se.getSQLState())))) {
-                System.out.println("Derby shut down normally");
+                Server.print("Derby shut down normally");
             } else {
                 System.err.println("Derby did not shut down normally");
                 printSQLException(se);
@@ -134,7 +134,7 @@ public class JDB {
                     "derbyDB", schemaName, "%", null);
             while (resultSet.next()) {
                 String strTableName = resultSet.getString("TABLE_NAME");
-                System.out.println("TABLE_NAME is " + strTableName + " schema - " + resultSet.getString(2));
+                Server.print("TABLE_NAME is " + strTableName + " schema - " + resultSet.getString(2));
             }
             Server.printRln("separator");
         } catch (SQLException sqlex) {
@@ -177,7 +177,7 @@ public class JDB {
             psInsert.setInt(6, t.getYear());
             psInsert.executeUpdate();
 
-            System.out.println("Zapisano odczyt z sensora: " + tableName + " : " + value1 + " : " + value2);
+            Server.print("Zapisano odczyt z sensora: " + tableName + " : " + value1 + " : " + value2);
         } catch (SQLException sqle) {
             printSQLException(sqle);
         }
@@ -188,7 +188,7 @@ public class JDB {
             ResultSet rs = s.executeQuery(
                     "SELECT * FROM "+ schemaName + "." + tableName + " ORDER BY rok, miesiac, dzien, Czas");            //(temp float, Czas time, dzien int, miesiac int, rok int)
             while (rs.next()) {
-                System.out.println(rs.getFloat(1) + " " + rs.getFloat(2) + " : " + rs.getString(3));
+                Server.print(rs.getFloat(1) + " " + rs.getFloat(2) + " : " + rs.getString(3));
             }
 
             if (rs != null) {

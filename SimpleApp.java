@@ -90,7 +90,7 @@ public class SimpleApp
     public static void main(String[] args)
     {
         new SimpleApp().go(args);
-        System.out.println("SimpleApp finished");
+        Server.print("SimpleApp finished");
     }
 
     /**
@@ -118,7 +118,7 @@ public class SimpleApp
         /* parse the arguments to determine which framework is desired*/
         parseArguments(args);
 
-        System.out.println("SimpleApp starting in " + framework + " mode");
+        Server.print("SimpleApp starting in " + framework + " mode");
 
         /* We will be using Statement and PreparedStatement objects for
          * executing SQL. These objects, as well as Connections and ResultSets,
@@ -166,7 +166,7 @@ public class SimpleApp
             conn = DriverManager.getConnection(protocol + dbName
                     + ";create=true", props);
 
-            System.out.println("Connected to and created database " + dbName);
+            Server.print("Connected to and created database " + dbName);
 
             // We want to control transactions manually. Autocommit is on by
             // default in JDBC.
@@ -179,7 +179,7 @@ public class SimpleApp
 
             // We create a table...
             s.execute("create table location(num int, addr varchar(40))");
-            System.out.println("Created table location");
+            Server.print("Created table location");
 
             // and add a few rows...
 
@@ -198,12 +198,12 @@ public class SimpleApp
             psInsert.setInt(1, 1956);
             psInsert.setString(2, "Webster St.");
             psInsert.executeUpdate();
-            System.out.println("Inserted 1956 Webster");
+            Server.print("Inserted 1956 Webster");
 
             psInsert.setInt(1, 1910);
             psInsert.setString(2, "Union St.");
             psInsert.executeUpdate();
-            System.out.println("Inserted 1910 Union");
+            Server.print("Inserted 1910 Union");
 
             // Let's update some rows as well...
 
@@ -216,13 +216,13 @@ public class SimpleApp
             psUpdate.setString(2, "Grand Ave.");
             psUpdate.setInt(3, 1956);
             psUpdate.executeUpdate();
-            System.out.println("Updated 1956 Webster to 180 Grand");
+            Server.print("Updated 1956 Webster to 180 Grand");
 
             psUpdate.setInt(1, 300);
             psUpdate.setString(2, "Lakeshore Ave.");
             psUpdate.setInt(3, 180);
             psUpdate.executeUpdate();
-            System.out.println("Updated 180 Grand to 300 Lakeshore");
+            Server.print("Updated 180 Grand to 300 Lakeshore");
 
 
             /*
@@ -251,7 +251,7 @@ public class SimpleApp
                 failure = true;
                 reportFailure("No rows in ResultSet");
             }
-            System.out.println(rs.getString(2));
+            Server.print(rs.getString(2));
             if ((number = rs.getInt(1)) != 300)
             {
 
@@ -280,19 +280,19 @@ public class SimpleApp
             }
 
             if (!failure) {
-                System.out.println("Verified the rows");
+                Server.print("Verified the rows");
             }
 
             // delete the table
             s.execute("drop table location");
-            System.out.println("Dropped table location");
+            Server.print("Dropped table location");
 
             /*
                We commit the transaction. Any changes will be persisted to
                the database now.
              */
             conn.commit();
-            System.out.println("Committed the transaction");
+            Server.print("Committed the transaction");
 
             /*
              * In embedded mode, an application should shut down the database.
@@ -330,7 +330,7 @@ public class SimpleApp
                     if (( (se.getErrorCode() == 50000)
                             && ("XJ015".equals(se.getSQLState()) ))) {
                         // we got the expected exception
-                        System.out.println("Derby shut down normally");
+                        Server.print("Derby shut down normally");
                         // Note that for single database shutdown, the expected
                         // SQL state is "08006", and the error code is 45000.
                     } else {

@@ -10,6 +10,7 @@ import java.io.*;
 public class Main extends JFrame implements ActionListener{
 
     private JTextArea LogTextField;
+    private JCheckBox SaveCheckBox;
     private static Server srv;
     private static Main mn;
     public static void main(String args[]) throws IOException {
@@ -25,8 +26,8 @@ public class Main extends JFrame implements ActionListener{
         setLayout(null);
         JButton StartButton = new JButton("Dodaj Sensor");
         JButton StopButton = new JButton("Usuń Sensor");
-        //StartButton.setSize(100,100);
-       // StopButton.setSize(100,100);
+        SaveCheckBox = new JCheckBox("Zapisac zmiany?");
+        SaveCheckBox.setBounds(0, 200, 150,50);
         LogTextField = new JTextArea();
         LogTextField.setBounds(150,0,400,600);
         //LogTextField.setEnabled(false);
@@ -37,6 +38,7 @@ public class Main extends JFrame implements ActionListener{
         StopButton.addActionListener(this);
         add(StartButton);
         add(StopButton);
+        add(SaveCheckBox);
         add(LogTextField);
 
         this.addWindowListener(new java.awt.event.WindowAdapter() {
@@ -46,6 +48,9 @@ public class Main extends JFrame implements ActionListener{
                         "Are you sure to close this window?", "Really Closing?",
                         JOptionPane.YES_NO_OPTION,
                         JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION){
+                    if (SaveCheckBox.isSelected())
+                            Server.jdb.closeStatements();
+                    Server.jdb.closeDatabase();
                     System.exit(0);
                 }
             }

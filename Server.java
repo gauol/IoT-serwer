@@ -1,5 +1,6 @@
 import javax.swing.*;
 import java.io.IOException;
+import java.net.Inet4Address;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.nio.ByteBuffer;
@@ -26,7 +27,7 @@ import java.util.regex.Pattern;
 
 public class Server {
     private static int printetChart = 0;
-    private static JDB jdb;
+    public static JDB jdb;
     private static ArrayList<String> tabele;
     private static int port = 90;
     private static JTextArea LogTextField;
@@ -124,7 +125,7 @@ public class Server {
         try {
             SocketAddress localport = new InetSocketAddress(port);
             ServerSocketChannel tcpserver = ServerSocketChannel.open();
-            tcpserver.socket().bind(new InetSocketAddress("localhost", port));
+            tcpserver.socket().bind(new InetSocketAddress(port));
             DatagramChannel udpserver = DatagramChannel.open();
 
             udpserver.socket().bind(localport);

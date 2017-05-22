@@ -30,9 +30,11 @@ public class Server {
     public static JDB jdb;
     private static ArrayList<String> tabele;
     private static int port = 90;
-    private static JTextArea LogTextField;
+    public static JTextArea LogTextField;
+    public static Main mn;
 
     public static void main(String[] args) {
+        mn = new Main();
         go();
     }
 
@@ -46,7 +48,7 @@ public class Server {
         go();
     }
 
-    private static void go(){
+    public static void go(){
         try {
             jdb = new JDB();
             runSerwer();

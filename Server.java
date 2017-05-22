@@ -37,10 +37,12 @@ public class Server {
 
      Server(int port){
         Server.port = port;
+        go();
      }
      Server(int port, JTextArea jta){
         Server.port = port;
         LogTextField = jta;
+        go();
     }
 
     private static void go(){
@@ -55,16 +57,16 @@ public class Server {
 
     public static void getHtmlBuffer(String path, SocketChannel dos) throws IOException {
         tabele = jdb.listTablesToArray();
-        print(path);
+        print("Zapytanie : " + path);
         if (path.equals("/"))
             path = "/index.html";
         if(path.charAt(1)=='?') {
             printetChart = Integer.parseInt(path.replaceAll("[\\D]", ""));
             path = "/index.html";
         }
-        if (path.equals("/favicon.ico")){
-
-        }
+//        if (path.equals("/favicon.ico")){
+//
+//        }
         try{
             Path pathF = Paths.get(System.getProperty("user.dir")+"/src/web" + path);
             byte bytes[] = Files.readAllBytes(pathF);
@@ -75,6 +77,15 @@ public class Server {
                 int index;
                 if(printetChart == 0){
                     nazwaWykresu = "Wybierz wykres z menu";
+                    index = response.indexOf("<!-- TuWklejPomiary -->"); //     ",\r\n['" + data + ", " + temp + "]"
+                    String smile = ",['*', 15, 0],\n" +
+                            "['*', 30, -5],\n" +
+                            "['*', 15, -8],\n" +
+                            "['*', 13, -10],\n"+
+                            "['*', 15, -8],\n" +
+                            "['*', 30, -5],\n" +
+                            "['*', 15, -0],\n";
+                    response = new StringBuilder(response).insert(index, smile).toString();
                 }else {
                     nazwaWykresu = "Wykres :" + printetChart;
                     index = response.indexOf("<!-- TuWklejPomiary -->"); //     ",\r\n['" + data + ", " + temp + "]"
@@ -82,7 +93,6 @@ public class Server {
                         String daneZBazy = jdb.getDataHTML(tabele.get(printetChart - 1));
                         response = new StringBuilder(response).insert(index, daneZBazy).toString();
                     }catch (IndexOutOfBoundsException ignored){}
-
                 }
                 index = response.indexOf("<!-- TuWklejSensory -->");
                 response = new StringBuilder(response).insert(index, getTablesListHTTP()).toString();
@@ -106,7 +116,7 @@ public class Server {
             dos.write(encoder.encode(CharBuffer.wrap(str)));
         }finally {
             dos.close();
-            print("zamykam");
+            print("\tZamykam połączenie");
         }
     }
 
@@ -209,8 +219,7 @@ public class Server {
     public static void print(String str){
         System.out.println(str);
         if(LogTextField!=null)
-            LogTextField.setText(new Czas().getTime() + str +LogTextField.getText());
-        //LogTextField.setCaretPosition(LogTextField.getDocument().getLength());
+            LogTextField.setText(new Czas().getTime()+"\t"+ str +"\r\n"+LogTextField.getText());
     }
 
 }

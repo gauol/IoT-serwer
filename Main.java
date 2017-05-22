@@ -11,40 +11,53 @@ public class Main extends JFrame implements ActionListener{
 
     private JTextArea LogTextField;
     private static Server srv;
-
+    private static Main mn;
     public static void main(String args[]) throws IOException {
         Server.print("To jest pierwsza linia programu \r\n to jest druga linia");
-        new Main().setVisible(true);
+        mn = new Main();
     }
 
     private Main(){
-        super("Nazwa Aplikacji");
-        setSize(620,200);
+        super("IoT Serwer");
+        setSize(600,600);
         //setResizable(false);
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         setLayout(null);
-        JButton StartButton = new JButton("Start");
-        JButton StopButton = new JButton("Stop");
+        JButton StartButton = new JButton("Dodaj Sensor");
+        JButton StopButton = new JButton("Usuń Sensor");
         //StartButton.setSize(100,100);
        // StopButton.setSize(100,100);
         LogTextField = new JTextArea();
-        LogTextField.setBounds(100,0,400,200);
+        LogTextField.setBounds(150,0,400,600);
         //LogTextField.setEnabled(false);
         LogTextField.setEditable(false);
-        StartButton.setBounds(0,0,100,100);
-        StopButton.setBounds(500,0,100,100);
+        StartButton.setBounds(0,0,150,50);
+        StopButton.setBounds(0,100,150,50);
         StartButton.addActionListener(this);
         StopButton.addActionListener(this);
         add(StartButton);
         add(StopButton);
         add(LogTextField);
 
-        srv = new Server(90);
+        this.addWindowListener(new java.awt.event.WindowAdapter() {
+            @Override
+            public void windowClosing(java.awt.event.WindowEvent windowEvent) {
+                if (JOptionPane.showConfirmDialog(mn,
+                        "Are you sure to close this window?", "Really Closing?",
+                        JOptionPane.YES_NO_OPTION,
+                        JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION){
+                    System.exit(0);
+                }
+            }
+        });
+        setVisible(true);
+        srv = new Server(90, LogTextField);
     }
 
     @Override
     public void actionPerformed(ActionEvent e){
         String name = e.getActionCommand();
+        Server.print(e.getActionCommand());
         if(name.equals("Start")){
             LogTextField.setText(new Czas().getTime() + "\t Wcisnieto start\n\r"+LogTextField.getText());
             LogTextField.setCaretPosition(LogTextField.getDocument().getLength());

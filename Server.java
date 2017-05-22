@@ -133,7 +133,7 @@ public class Server {
                         else if (key.isReadable() && c == udpserver) {
                             SocketAddress clientAddress = udpserver.receive(receiveBuffer);
                             receiveBuffer.position(0);
-                            printRln("Separator");
+                            //printRln("Separator");
                             interpreterUDP(clientAddress.toString(), new String( receiveBuffer.array(),"UTF-8"));
                         }else if (key.isReadable()) {
                             printRln("Separator");
@@ -184,14 +184,16 @@ public class Server {
     }
 
     private static void interpreterUDP(String from, String data){
-        String inte = data;
-        Pattern p = Pattern.compile("(SEN=)(\\D+):(TEMP1=)(\\d+.\\d+):(TEMP2=)(\\d+.\\d+)");
-        Matcher m = p.matcher(inte);
+        Pattern p = Pattern.compile("(SEN=)(\\D+):(TEMP1=)(.?\\d+.\\d+):(TEMP2=)(.?\\d+.\\d+)");
+        Matcher m = p.matcher(data);
         if(m.find()) {
             String id = m.group(2);
             String temp1 = m.group(4);
             String temp2 = m.group(6);
-            System.out.println("Odebrano Dane : SEN = " + id + " : " + Float.parseFloat(temp1) + " : " + Float.parseFloat(temp2)+" od: " + from );
+            System.out.println("Odebrano Dane : SEN = "+id+" : " + temp1 +" : "+ temp2);
+            jdb.addData(id, Float.parseFloat(temp1),Float.parseFloat(temp2));
         }
+        else
+            printRln("Error Interpretacji" + data);
     }
 }

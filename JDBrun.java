@@ -1,3 +1,4 @@
+import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.util.Random;
 
@@ -16,38 +17,44 @@ public class JDBrun {
 
 //        jdb.createTable("Kuchnia");
 //        jdb.createTable("Jadalnia");
-//        jdb.createTable("Lazieka");
+//        jdb.createTable("Lazienka");
 //        jdb.createTable("Sypialnia");
 
 //        jdb.delateTable("JADALNIA");
 //        jdb.delateTable("KUCHNIA");
-//        jdb.delateTable("LAZIEKA");
+//        jdb.delateTable("LAZIENKA");
 //        jdb.delateTable("SYPIALNIA");
         //System.out.println(jdb.listTablesHTTP());
 
 //        jdb.createTable("Lazienka");
-        String tableNejm = "JADALNIA";
+        String tableNejm = "Sypialnia";
 //        jdb.deleteData(tableNejm);
-        jdb.addData(tableNejm, nextFloat(-13,45));
-        Thread.sleep(10000);
-        jdb.addData(tableNejm, nextFloat(-13,45));
-        Thread.sleep(10000);
-        jdb.addData(tableNejm, nextFloat(-13,45));
-        Thread.sleep(10000);
-        jdb.addData(tableNejm, nextFloat(-13,45));
-        Thread.sleep(10000);
-        jdb.addData(tableNejm, nextFloat(-13,45));
-       //Thread.sleep(10000);
 
+        jdb.addData(tableNejm, nextFloat(),nextFloat());
+        Thread.sleep(10000);
+        jdb.addData(tableNejm, nextFloat(),nextFloat());
+        Thread.sleep(10000);
+        jdb.addData(tableNejm, nextFloat(),nextFloat());
+        Thread.sleep(10000);
+        jdb.addData(tableNejm, nextFloat(),nextFloat());
+        Thread.sleep(10000);
+        jdb.addData(tableNejm, nextFloat(),nextFloat());
         jdb.getData(tableNejm);
 
-        //jdb.listTables();
+        jdb.listTables();
         jdb.closeStatements();
         jdb.closeDatabase();
     }
 
-    private static float nextFloat(float min, float max)
+    private static float nextFloat()
     {
-        return (min + random.nextFloat() * (max - min));
+        float min =-15, max=35;
+        return round(min + random.nextFloat() * (max - min),2);
+    }
+
+    private static float round(float d, int decimalPlace) {
+        BigDecimal bd = new BigDecimal(Float.toString(d));
+        bd = bd.setScale(decimalPlace, BigDecimal.ROUND_HALF_UP);
+        return bd.floatValue();
     }
 }

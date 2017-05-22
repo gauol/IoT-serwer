@@ -63,8 +63,7 @@ public class JDB {
 
     public void createTable(String tableName) {
         try {
-            // We create a table...
-            s.execute("create table " + schemaName + "." + tableName + " (temp float, Czas time, dzien int, miesiac int, rok int)");
+            s.execute("create table " + schemaName + "." + tableName + " (temp1 float, temp2 float, Czas time, dzien int, miesiac int, rok int)");
             System.out.println("Created table: " + tableName);
         } catch (SQLException sqlex) {
             printSQLException(sqlex);
@@ -163,21 +162,22 @@ public class JDB {
 
     }
 
-    public void addData(String tableName, float wartosc) {
+    public void addData(String tableName, float value1, float value2) {
         try {
             Czas t = new Czas();
             psInsert = conn.prepareStatement(
-                    "insert into " + schemaName + "." + tableName + " values (?, ?, ?, ?, ?)");    //(temp float, Czas time, dzien int, miesiac int, rok int)
+                    "insert into " + schemaName + "." + tableName + " values (?, ?, ?, ?, ?, ?)");    //(temp1 float, temp2 float, Czas time, dzien int, miesiac int, rok int)
             statements.add(psInsert);
 
-            psInsert.setFloat(1, wartosc);
-            psInsert.setTime(2, new Time(t.getMsTime()));
-            psInsert.setInt(3, t.getDzien());
-            psInsert.setInt(4, t.getMonth());
-            psInsert.setInt(5, t.getYear());
+            psInsert.setFloat(1, value1);
+            psInsert.setFloat(2, value2);
+            psInsert.setTime(3, new Time(t.getMsTime()));
+            psInsert.setInt(4, t.getDzien());
+            psInsert.setInt(5, t.getMonth());
+            psInsert.setInt(6, t.getYear());
             psInsert.executeUpdate();
 
-            System.out.println("Zapisano odczyt z sensora: " + tableName + " : " + wartosc);
+            System.out.println("Zapisano odczyt z sensora: " + tableName + " : " + value1 + " : " + value2);
         } catch (SQLException sqle) {
             printSQLException(sqle);
         }
@@ -188,7 +188,7 @@ public class JDB {
             ResultSet rs = s.executeQuery(
                     "SELECT * FROM "+ schemaName + "." + tableName + " ORDER BY rok, miesiac, dzien, Czas");            //(temp float, Czas time, dzien int, miesiac int, rok int)
             while (rs.next()) {
-                System.out.println(rs.getFloat(1) + " " + rs.getString(2));
+                System.out.println(rs.getFloat(1) + " " + rs.getFloat(2) + " : " + rs.getString(3));
             }
 
             if (rs != null) {
@@ -207,8 +207,8 @@ public class JDB {
             ResultSet rs = s.executeQuery(
                     "SELECT * FROM "+ schemaName + "." + tableName + " ORDER BY rok, miesiac, dzien, Czas");            //(temp float, Czas time, dzien int, miesiac int, rok int)
             while (rs.next()) {
-                String eventDate = rs.getTime(2).toString() + " " + rs.getInt(3) + "-" + rs.getInt(4) + "-" + rs.getInt(5);
-                str.append( ",\r\n['" + eventDate + "', " + rs.getFloat(1) + "]");
+                String eventDate = rs.getTime(3).toString() + " " + rs.getInt(4) + "-" + rs.getInt(5) + "-" + rs.getInt(6);
+                str.append( ",\r\n['" + eventDate + "', " + rs.getFloat(1) +", "+rs.getFloat(2) +"]");
             }
 
             if (rs != null) {
@@ -234,6 +234,19 @@ public class JDB {
                 rs = null;
             }
 
+        } catch (SQLException sqle) {
+            printSQLException(sqle);
+        }
+    }
+
+    public void executeQuery(String query) {
+        try {
+            ResultSet rs = s.executeQuery(
+                    query);            //(temp float, Czas time, dzien int, miesiac int, rok int)
+            if (rs != null) {
+                rs.close();
+                rs = null;
+            }
         } catch (SQLException sqle) {
             printSQLException(sqle);
         }

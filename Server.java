@@ -14,6 +14,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -28,12 +29,13 @@ import java.util.regex.Pattern;
 public class Server {
     private static int printetChart = 0;
     public static JDB jdb;
-    private static ArrayList<String> tabele;
+    public static List<String> tabele;
     private static int port = 90;
     public static JTextArea LogTextField;
     public static Main mn;
 
     public static void main(String[] args) {
+
         mn = new Main();
         go();
     }
@@ -92,10 +94,15 @@ public class Server {
                 }else {
                     nazwaWykresu = "Wykres :" + printetChart;
                     index = response.indexOf("<!-- TuWklejPomiary -->"); //     ",\r\n['" + data + ", " + temp + "]"
+                    String daneZBazy = "";
                     try {
-                        String daneZBazy = jdb.getDataHTML(tabele.get(printetChart - 1));
+                        daneZBazy = jdb.getDataHTML(tabele.get(printetChart - 1));
+                    }catch (IndexOutOfBoundsException ignored){
+                    }finally {
+                        if (daneZBazy.equals(""))
+                            daneZBazy = ",['*', 15, 0],\n" + "['*', 0, 15],\n";
                         response = new StringBuilder(response).insert(index, daneZBazy).toString();
-                    }catch (IndexOutOfBoundsException ignored){}
+                    }
                 }
                 index = response.indexOf("<!-- TuWklejSensory -->");
                 response = new StringBuilder(response).insert(index, getTablesListHTTP()).toString();
@@ -224,5 +231,4 @@ public class Server {
         if(LogTextField!=null)
             LogTextField.setText(new Czas().getTime()+"\t"+ str +"\r\n"+LogTextField.getText());
     }
-
 }

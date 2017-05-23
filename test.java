@@ -1,5 +1,7 @@
 import javax.swing.*;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 
 /**
@@ -7,7 +9,10 @@ import java.io.IOException;
  */
 public class test {
     public static void main(String[] args) {
-
-
+        List<String> myArrayList = new ArrayList<String>();
+        myArrayList.add("raz");
+        myArrayList.add("dwa");
+        String[] myArray = myArrayList.toArray(new String[myArrayList.size()]);
+        System.out.println(myArray.toString());
     }
 }

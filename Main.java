@@ -5,6 +5,8 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.*;
+import java.net.URI;
+import java.net.URISyntaxException;
 
 
 /**
@@ -20,6 +22,9 @@ public class Main extends JFrame implements ActionListener{
     private static JTextField DeleteTextField;
     private static JScrollPane scroll;
 
+    private final static String addStr = "Dodaj Sensor";
+    private final static String delStr = "Usuń Sensor";
+    private final static String openWebStr = "Otwórz przeglądarkę";
     public static void main(String args[]) throws IOException {
         Server.print("To jest pierwsza linia programu \r\n to jest druga linia");
         Server.mn = new Main();
@@ -27,36 +32,33 @@ public class Main extends JFrame implements ActionListener{
 
     public Main(){
         super("IoT Serwer");
-        setSize(400,200);
+        setSize(400,250);
         setResizable(false);
         setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
         setLayout(null);
 
-        JButton AddButton = new JButton("Dodaj Sensor");
+        JButton AddButton = new JButton(addStr);
         AddButton.setBounds(220,10,150,50);
         AddButton.addActionListener(this);
         add(AddButton);
 
-        AddTextField = new JTextField();
-        AddTextField.setBounds(220,60,150,20);
-        add(AddTextField);
-
-        JButton DeleteButton = new JButton("Usuń Sensor");
+        JButton DeleteButton = new JButton(delStr);
         DeleteButton.setBounds(220,100,150,50);
         DeleteButton.addActionListener(this);
         add(DeleteButton);
 
-        DeleteTextField = new JTextField();
-        DeleteTextField.setBounds(220,150,150,20);
-        add(DeleteTextField);
+        JButton OpenWebButton = new JButton(openWebStr);
+        OpenWebButton.setBounds(10,100,150,50);
+        OpenWebButton.addActionListener(this);
+        add(OpenWebButton);
 
         JButton LogButton = new JButton("Pokaż Log");
         LogButton.setBounds(10,10,150,50);
         LogButton.addActionListener(this);
         add(LogButton);
 
-        SaveCheckBox = new JCheckBox("Zapisac zmiany w bazie?");
-        SaveCheckBox.setBounds(10, 100, 200,50);
+        SaveCheckBox = new JCheckBox("Zapisac zmiany w bazie po zamknięciu?");
+        SaveCheckBox.setBounds(10, 160, 400,50);
         add(SaveCheckBox);
 
         this.addWindowListener(new java.awt.event.WindowAdapter() {
@@ -81,19 +83,30 @@ public class Main extends JFrame implements ActionListener{
         String name = e.getActionCommand();
         Server.print(e.getActionCommand());
         switch (name) {
-            case "Dodaj Sensor":
+            case addStr:
                 if (LogTextField != null)
-                    LogTextField.setText(new Czas().getTime() + "\t Wcisnieto start\n\r" + LogTextField.getText());
+                    LogTextField.setText(new Czas().getTime() + "\t Wcisnieto "+addStr+"\n\r" + LogTextField.getText());
+                createAddOrDeleteWindow(name);
                 break;
-            case "Usuń Sensor":
+            case delStr:
                 if (LogTextField != null)
-                    LogTextField.setText(new Czas().getTime() + "\t Wcisnieto stop\n\r" + LogTextField.getText());
+                    LogTextField.setText(new Czas().getTime() + "\t Wcisnieto " + delStr + "\n\r" + LogTextField.getText());
+                createAddOrDeleteWindow(name);
                 break;
             case "Pokaż Log":
                 if (LogTextField != null)
                     LogTextField.setText(new Czas().getTime() + "\t Pokaż Log\n\r" + LogTextField.getText());
                 createLogWindow();
                 break;
+            case openWebStr:
+                if(Desktop.isDesktopSupported())
+                {
+                    try {
+                        Desktop.getDesktop().browse(new URI("http://localhost:90"));
+                    } catch (IOException | URISyntaxException e1) {
+                        e1.printStackTrace();
+                    }
+                }
         }
 
     }
@@ -116,5 +129,37 @@ public class Main extends JFrame implements ActionListener{
         frame.setLocation(spawnPoint);
         frame.setVisible(true);
 
+    }
+
+    public static void createAddOrDeleteWindow(String str){
+        switch (str){
+            case addStr :
+                String input = JOptionPane.showInputDialog(new JFrame(str),"Podaj nazwę sensora");
+                if (!input.equals("")){
+                    Server.jdb.createTable(input);
+                    Server.print("Dodano sensor : " + input);
+                }else
+                    infoBox("Nie podałeś nazwy sensora!", "Error!!!");
+
+                break;
+            case delStr :
+                Server.tabele = Server.jdb.listTablesToArray();
+                String[] possibilities = Server.tabele.toArray(new String[Server.tabele.size()]);
+                String s = (String)JOptionPane.showInputDialog(
+                        Server.mn,
+                        "Wybierz sensor który chcesz usunąć",
+                        "Usuń sensor",
+                        JOptionPane.PLAIN_MESSAGE,
+                        null,
+                        possibilities,
+                        possibilities[0]);
+                Server.print("Usuwam : " + s);
+                break;
+        }
+    }
+
+    public static void infoBox(String infoMessage, String titleBar)
+    {
+        JOptionPane.showMessageDialog(null, infoMessage, "InfoBox: " + titleBar, JOptionPane.INFORMATION_MESSAGE);
     }
 }
